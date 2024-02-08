@@ -136,3 +136,19 @@ def follow(request, user_id):
         
         return HttpResponseRedirect(reverse("profile", args=(following_user.username,)))
 
+
+def following_view(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
+
+    user = request.user
+    following = Follow.objects.filter(user=user)
+    following_users = [follow.following for follow in following]
+    
+    following_posts = Post.objects.filter(user__in=following_users).order_by("-created_at")
+
+    return render(request, "network/following.html",{
+        "following_posts": following_posts
+    })
+
+
