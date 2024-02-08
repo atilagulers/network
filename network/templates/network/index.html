@@ -6,25 +6,35 @@
 
 <div>
   <h2>All Posts</h2>
-
-  <div class="new-post-container">
-    <h5>New Post</h5>
-    <form action="" class="new-post-form">
-        <textarea name="new-post" id="new-post" ></textarea>
-        <input class="btn btn-primary" type="submit" value="Post">
-    </form>
-  </div>
-
-  <div class="posts">
-      <div class="post">
-        <h5>Foo</h5>
-
-        <a href="">Edit</a>
-        <p>Hello</p>
-        <p>Posted on 2021-01-01</p>
-        
+    {% if user.is_authenticated %}
+    <div class="new-post-container">
+        <h5>New Post</h5>
+        <form action="/posts/create" method="post" class="new-post-form">
+            {% csrf_token %}
+            <textarea name="content" id="content" ></textarea>
+            <input class="btn btn-primary" type="submit" value="Post">
+        </form>
     </div>
-  </div>
+    {% endif %}
+ 
+
+{% for post in posts %}
+    <div class="posts">
+        <div class="post">
+            <h5>{{post.user.username}}</h5>
+            <a href="">Edit</a>
+            <p>{{post.content}}</p>
+            <p>{{post.created_at}}</p>
+            <form action="posts/like" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="post_id" value="{{ post.id }}">
+                <button class="like-btn">
+                    ♥️ {{post.likes.count}}
+                </button>
+            </form>
+        </div>
+    </div>
+{% endfor %}
 </div>
 
 {% endblock %}

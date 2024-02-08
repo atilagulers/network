@@ -28,3 +28,15 @@ body {
   padding: 12px;
   border: 1px solid #ccc;
 }
+
+.like-btn {
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.like-btn:focus {
+  border: none;
+  outline: none;
+}

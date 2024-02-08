@@ -1,14 +1,18 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User
+from .models import User, Post, Like
 
 
 def index(request):
-    return render(request, "network/index.html")
+    posts = Post.objects.all().order_by("-created_at")
+
+    return render(request, "network/index.html", {
+        "posts": posts
+    })
 
 
 def login_view(request):
@@ -61,3 +65,38 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "network/register.html")
+
+def create_post(request):
+    user = request.user
+
+    if not user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
+    
+    if request.method == 'POST':
+        content = request.POST['content']
+        new_post = Post(content=content, user=user)
+        new_post.save()
+
+        return HttpResponseRedirect(reverse("index"))
+
+def like_post(request):
+    user = request.user
+
+    if not user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
+
+    if request.method == 'POST':
+        post_id = request.POST['post_id']
+        post = Post.objects.get(pk=post_id)
+
+        liked_post = Like.objects.filter(user=user, post=post).first()
+
+        if liked_post:
+            liked_post.delete()
+        else:
+            like = Like(user=user, post=post)
+            like.save()
+
+        likes_count = post.likes.count()
+
+    return HttpResponseRedirect(reverse("index"))
