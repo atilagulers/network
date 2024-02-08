@@ -1,0 +1,30 @@
+{% extends "network/layout.html" %} 
+{% load static %}
+
+
+{% block body %} 
+
+<div>
+  <h2>All Posts</h2>
+
+  <div class="new-post-container">
+    <h5>New Post</h5>
+    <form action="" class="new-post-form">
+        <textarea name="new-post" id="new-post" ></textarea>
+        <input class="btn btn-primary" type="submit" value="Post">
+    </form>
+  </div>
+
+  <div class="posts">
+      <div class="post">
+        <h5>Foo</h5>
+
+        <a href="">Edit</a>
+        <p>Hello</p>
+        <p>Posted on 2021-01-01</p>
+        
+    </div>
+  </div>
+</div>
+
+{% endblock %}
