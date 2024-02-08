@@ -4,7 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User, Post, Like
+from .models import User, Post, Like, Follow
 
 
 def index(request):
@@ -103,7 +103,8 @@ def like_post(request):
 
 def profile_view(request, username):
     user = User.objects.get(username=username)
-    
+    is_following = Follow()
+
     return render(request, "network/profile.html", {
         "user": user
     })

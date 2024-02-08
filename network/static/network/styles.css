@@ -40,3 +40,21 @@ body {
   border: none;
   outline: none;
 }
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.profile-card {
+  margin-bottom: 32px;
+  padding: 12px;
+  display: flex;
+  gap: 32px;
+  border: 1px solid #ccc;
+}
+
+.follow-btn {
+  margin: 12px 0;
+}
