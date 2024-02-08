@@ -103,8 +103,32 @@ def like_post(request):
 
 def profile_view(request, username):
     user = User.objects.get(username=username)
-    is_following = Follow()
-
+    is_following = Follow.objects.filter(following=user)
+    
     return render(request, "network/profile.html", {
-        "user": user
+        "user": user,
+        "is_following": is_following
     })
+
+
+def follow(request, user_id):
+    if request.method == 'POST':
+        user = request.user
+
+        if not user.is_authenticated:
+            return HttpResponseRedirect(reverse("login"))
+
+        if user.id == user_id:
+            return HttpResponseRedirect(reverse("profile"))
+
+        following_user = User.objects.get(pk=user_id)
+
+        follow_exists = Follow.objects.filter(user=user, following=following_user).exists()
+        if follow_exists:
+            Follow.objects.filter(user=user, following=following_user).delete()
+        else:         
+            follow = Follow(user=user, following=following_user)
+            follow.save()   
+
+
+        return HttpResponseRedirect(reverse("profile", args=(following_user,)))
