@@ -100,3 +100,10 @@ def like_post(request):
         likes_count = post.likes.count()
 
     return HttpResponseRedirect(reverse("index"))
+
+def profile_view(request, username):
+    user = User.objects.get(username=username)
+    
+    return render(request, "network/profile.html", {
+        "user": user
+    })
