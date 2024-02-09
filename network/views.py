@@ -4,15 +4,31 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib import messages
 from .models import User, Post, Like, Follow
 
+def paginate(request, items):
+    p = Paginator(items, 10)
+    page_number = request.GET.get('page', 1)
+    page_obj = p.get_page(page_number)
+
+    try:
+        page_obj = p.page(page_number)
+    except PageNotAnInteger:
+        page_obj = p.page(1)
+    except EmptyPage:
+        page_obj = p.page(p.num_pages)
+
+    return page_obj
 
 def index(request):
     posts = Post.objects.all().order_by("-created_at")
+    page_obj = paginate(request, posts)
 
+   
     return render(request, "network/index.html", {
-        "posts": posts
+        "page_obj": page_obj,
     })
 
 
@@ -106,8 +122,11 @@ def profile_view(request, username):
     user = User.objects.get(username=username)
     is_following = Follow.objects.filter(following=user)
 
+    page_obj = paginate(request, user.posts.all().order_by("-created_at"))
+
     return render(request, "network/profile.html", {
         "user": user,
+        "page_obj": page_obj,
         "is_following": is_following,
         "is_self": request.user == user,
     })
@@ -147,8 +166,10 @@ def following_view(request):
     
     following_posts = Post.objects.filter(user__in=following_users).order_by("-created_at")
 
+    page_obj = paginate(request, following_posts)
+
     return render(request, "network/following.html",{
-        "following_posts": following_posts
+        "page_obj": page_obj
     })
 
 
