@@ -1,6 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 
@@ -97,7 +97,6 @@ def create_post(request):
         return HttpResponseRedirect(reverse("index"))
 
 def like_post(request, post_id):
-    print(post_id)
     user = request.user
     if not user.is_authenticated:
         return HttpResponseRedirect(reverse("login"))
@@ -117,7 +116,11 @@ def like_post(request, post_id):
     return JsonResponse({"likes": post.likes.count()})
 
 def profile_view(request, username):
-    user = User.objects.get(username=username)
+    try:
+        user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        raise Http404("User does not exist")
+
     is_following = Follow.objects.filter(following=user)
 
     page_obj = paginate(request, user.posts.all().order_by("-created_at"))
@@ -171,3 +174,12 @@ def following_view(request):
     })
 
 
+def edit_post(request, post_id):
+    post = Post.objects.get(pk=post_id)
+
+    if request.method == 'POST':
+        content = request.POST['content']
+        post.content = content
+        post.save()
+
+        return HttpResponseRedirect(reverse("index"))

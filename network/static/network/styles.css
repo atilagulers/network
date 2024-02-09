@@ -58,3 +58,9 @@ body {
 .follow-btn {
   margin: 12px 0;
 }
+
+.edit-post-textarea {
+  padding: 12px;
+  width: 100%;
+  display: none;
+}
