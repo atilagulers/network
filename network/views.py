@@ -28,7 +28,7 @@ def index(request):
 
    
     return render(request, "network/index.html", {
-        "page_obj": page_obj,
+        "page_obj": page_obj
     })
 
 
@@ -96,14 +96,14 @@ def create_post(request):
 
         return HttpResponseRedirect(reverse("index"))
 
-def like_post(request):
+def like_post(request, post_id):
+    print(post_id)
     user = request.user
-
     if not user.is_authenticated:
         return HttpResponseRedirect(reverse("login"))
 
     if request.method == 'POST':
-        post_id = request.POST['post_id']
+        #post_id = request.POST['post_id']
         post = Post.objects.get(pk=post_id)
 
         liked_post = Like.objects.filter(user=user, post=post).first()
@@ -114,9 +114,7 @@ def like_post(request):
             like = Like(user=user, post=post)
             like.save()
 
-        likes_count = post.likes.count()
-
-    return HttpResponseRedirect(reverse("index"))
+    return JsonResponse({"likes": post.likes.count()})
 
 def profile_view(request, username):
     user = User.objects.get(username=username)
